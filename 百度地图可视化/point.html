@@ -140,12 +140,13 @@
           color: function (data) {
             return intensity.getColor(data.properties.count);
           },
+          data
         });
 
         // 3.将point对象加入View中
         view.addLayer(pointLayer);
         // 4.将data与point进行绑定
-        pointLayer.setData(data);
+        // pointLayer.setData(data);
       }
     </script>
   </body>
