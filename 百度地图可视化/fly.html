@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title></title>
+    <script
+      type="text/javascript"
+      src="https://api.map.baidu.com/api?v=1.0&type=webgl&ak=G1LFyjrNGIkns5OfpZnrCGAKxpycPLwb"
+    ></script>
+    <script src="https://mapv.baidu.com/gl/examples/static/common.js"></script>
+    <script
+      type="text/javascript"
+      src="https://mapv.baidu.com/build/mapv.js"
+    ></script>
+    <script src="https://code.bdstatic.com/npm/mapvgl@1.0.0-beta.54/dist/mapvgl.min.js"></script>
+    <script src="https://code.bdstatic.com/npm/mapvgl@1.0.0-beta.53/dist/mapvgl.threelayers.min.js"></script>
+    <style type="text/css">
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      #map_container {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map_container"></div>
+    <script type="text/javascript">
+      let map = initBMap();
+      let data = initData();
+      setData(data);
+
+      // 初始化百度地图
+      function initBMap() {
+        let map = initMap({
+          tilt: 0,
+          center: [108.154518, 36.643346],
+          zoom: 5,
+          style: darkStyle,
+        });
+        return map;
+      }
+
+      function initData() {
+        let randomCount = 1000;
+        let node_data = [
+          {
+            x: 108.154518,
+            y: 36.643346,
+          },
+        ];
+        let edge_data = [
+          {
+            source: 1,
+            target: 0,
+          },
+        ];
+        let cities = [
+          "北京",
+          "天津",
+          "上海",
+          "重庆",
+          "石家庄",
+          "太原",
+          "呼和浩特",
+          "哈尔滨",
+          "长春",
+          "沈阳",
+          "济南",
+          "南京",
+          "合肥",
+          "杭州",
+          "南昌",
+          "福州",
+          "郑州",
+          "武汉",
+          "长沙",
+          "广州",
+          "南宁",
+          "西安",
+          "银川",
+          "兰州",
+          "西宁",
+          "乌鲁木齐",
+          "成都",
+          "贵阳",
+          "昆明",
+          "拉萨",
+          "海口",
+        ];
+        // 构造数据
+        for (let i = 1; i < randomCount; i++) {
+          let cityCenter = mapv.utilCityCenter.getCenterByCityName(
+            cities[parseInt(Math.random() * cities.length)]
+          );
+          node_data.push({
+            x: cityCenter.lng - 5 + Math.random() * 10,
+            y: cityCenter.lat - 5 + Math.random() * 10,
+          });
+          edge_data.push({
+            source: parseInt(i * Math.random()),
+            target: 0,
+          });
+        }
+        // 边绑定算法
+        let fbundling = mapv
+          .utilForceEdgeBundling()
+          .nodes(node_data)
+          .edges(edge_data);
+
+        let results = fbundling();
+
+        let data = [];
+
+        // console.log(results);
+        for (let i = 0; i < results.length; i++) {
+          let line = results[i];
+          let coordinates = [];
+          for (let j = 0; j < line.length; j++) {
+            coordinates.push([line[j].x, line[j].y]);
+          }
+          data.push({
+            geometry: {
+              type: "LineString",
+              coordinates: coordinates,
+            },
+          });
+        }
+        return {
+          lineData: data,
+        };
+      }
+
+      // 绘制
+      function setData({ lineData }) {
+        let view = new mapvgl.View({ map });
+
+        // 线
+        let lineLayer = new mapvgl.LineLayer({
+          color: "rgba(55, 50, 250, 0.3)",
+          blend: "lighter",
+          width: 1,
+        });
+        view.addLayer(lineLayer);
+        lineLayer.setData(lineData);
+
+
+        // 点
+        let linePointLayer = new mapvgl.LinePointLayer({
+          size: 5,
+          speed: 12,
+          color: "rgba(255, 255, 0, 0.6)",
+          animationType: mapvgl.LinePointLayer.ANIMATION_TYPE_SMOOTH,
+          shapeType: mapvgl.LinePointLayer.SHAPE_TYPE_CIRCLE,
+          blend: "lighter",
+        });
+        view.addLayer(linePointLayer);
+        linePointLayer.setData(lineData);
+      }
+    </script>
+  </body>
+</html>
