@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3DMap</title>
+    <style type="text/css">
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body,
+      #container {
+        height: 100%;
+        width: 100%;
+      }
+      /* 隐藏版本信息 */
+      .anchorBL {
+        display: none;
+      }
+
+      /*要设置为block 否则不会出现*/
+      .BMap_stdMpZoom {
+        display: block;
+      }
+    </style>
+    <script
+      type="text/javascript"
+      src="https://api.map.baidu.com/api?type=webgl&v=1.0&ak=G1LFyjrNGIkns5OfpZnrCGAKxpycPLwb"
+    ></script>
+  </head>
+  <body>
+    <div id="container"></div>
+    <script>
+      // window.BMapGL
+      let map = new BMapGL.Map("container", {
+        minZoom: 5,
+        maxZoom: 10,
+      });
+      let point = new BMapGL.Point(116.404, 39.915);
+      map.centerAndZoom(point, 5); // 初始化地图,设置中心点坐标和地图级别
+      map.enableScrollWheelZoom(true); //开启鼠标滚轮缩放
+      map.setMapType(BMAP_EARTH_MAP); // 设置地图类型为地球模式
+      map.setHeading(30); // 设置地图旋转角度
+      map.setTilt(15); // 设置地图的倾斜角度
+
+      /*控件*/
+      // 添加比例尺控件
+      let scaleCtrl = new BMapGL.ScaleControl({
+        anchor: BMAP_ANCHOR_TOP_LEFT, // 控制控件位置
+        offset: new BMapGL.Size(100, 10), // 控件位置偏移
+      });
+      map.addControl(scaleCtrl);
+      // 添加缩放控件
+      let zoomCtrl = new BMapGL.ZoomControl({
+        anchor: BMAP_ANCHOR_BOTTOM_LEFT, // 控制控件位置
+      });
+      map.addControl(zoomCtrl);
+
+      //  事件
+      //   添加事件
+      map.addEventListener("zoomstart", function () {
+        console.log("zoomstart", map.getZoom());
+      });
+    </script>
+  </body>
+</html>
